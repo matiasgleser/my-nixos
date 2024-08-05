@@ -48,6 +48,7 @@
 
   # Enable the KDE Plasma Desktop Environment.
   services.displayManager.sddm.enable = true;
+  services.displayManager.sddm.autoNumlock = true;
   services.desktopManager.plasma6.enable = true;
 
   # Configure keymap in X11
@@ -96,24 +97,6 @@
   virtualisation.docker.enable = true;
   services.teamviewer.enable = true;
 
-  # Enable the TeamViewer service
-  # systemd.services.teamviewerd = {
-    # description = "TeamViewer Daemon";
-    # wantedBy = [ "multi-user.target" ];
-
-    # serviceConfig = {
-      # ExecStart = "${pkgs.teamviewer}/bin/teamviewerd -d";
-      # ExecStop = "${pkgs.teamviewer}/bin/teamviewerd --shutdown";
-      # Restart = "on-failure";
-    # };
-
-    # Ensure proper environment variables
-    # environment = {
-      # TEAMVIEWER_USE_HARDWARE_ACCELERATION = "false";
-    # };
-  # };
-
-
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
@@ -125,8 +108,15 @@
     python3
     git
     docker
+    go
     gcc
     wget
+    lunarvim
+    rustup
+
+    # Add hugo
+    hugo
+
     # Add Zed (Code Editor)
     zed-editor
 
