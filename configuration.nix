@@ -30,6 +30,25 @@
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
+  # Making fonts accessible to applications.
+  fonts = {
+    packages = with pkgs; [
+      terminus_font
+      font-awesome
+      noto-fonts
+      noto-fonts-emoji
+      (nerdfonts.override {fonts = ["Meslo"];})
+    ];
+    fontconfig = {
+      enable = true;
+      includeUserConf = true;
+      # defaultFonts.monospace = ["Meslo LG M Regular Nerd Font Complete Mono"];
+    };
+    fontDir = {
+      enable = true;
+    };
+  };
+
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "es_AR.UTF-8";
     LC_IDENTIFICATION = "es_AR.UTF-8";
@@ -113,7 +132,14 @@
     wget
     lunarvim
     rustup
-
+    nerdfonts
+    fira-code-nerdfont
+    zoxide
+    bat
+    openssl
+    neofetch
+    pkg-config
+    xclip
     # Add hugo
     hugo
 
@@ -166,4 +192,5 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.05"; # Did you read the comment?
 
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 }
