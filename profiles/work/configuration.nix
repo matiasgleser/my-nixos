@@ -146,7 +146,6 @@
     pkg-config
     xclip
     gparted
-    zoom-us
     # Add hugo
     hugo
 
