@@ -19,5 +19,17 @@
     (./. + "../../../user/apps/terminal"+("/"+userSettings.terminal)+".nix") # My default terminal selected from flake
   ];
 
+  # Packages to use
+  home.packages = (with pkgs; [
+
+    # rustdesk
+    (pkgs.writeShellScriptBin "rustdesk" ''
+      #!${pkgs.bash}/bin/bash
+      export GDK_BACKEND=x11
+      exec ${pkgs.rustdesk}/bin/rustdesk "$@"
+    '')
+
+  ]);
+
 }
 

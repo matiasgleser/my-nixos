@@ -6,8 +6,13 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
+    [ 
+      # Include the results of the hardware scan.
+      ../../system/hardware-configuration.nix
+
+      # Include system security config
+      # ../../system/security/firewall.nix
+      # ../../system/security/firejail.nix
     ];
 
   # Bootloader.
@@ -115,6 +120,8 @@
   # services.docker.enable = true;
   virtualisation.docker.enable = true;
   services.teamviewer.enable = true;
+  # services.accounts-daemon.enable = true;
+
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -137,6 +144,7 @@
     wget
     lunarvim
     rustup
+    cargo
     nerdfonts
     fira-code-nerdfont
     zoxide
@@ -146,6 +154,16 @@
     pkg-config
     xclip
     gparted
+    zoom-us
+    
+    # rustdesk
+    (pkgs.writeShellScriptBin "rustdesk" ''
+      #!${pkgs.bash}/bin/bash
+      export GDK_BACKEND=x11
+      exec ${pkgs.rustdesk}/bin/rustdesk "$@"
+    '')
+    
+    brave
     # Add hugo
     hugo
 
@@ -169,7 +187,8 @@
 
     teamviewer
     obsidian
- ];
+
+  ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
