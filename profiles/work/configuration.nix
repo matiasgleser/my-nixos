@@ -155,6 +155,7 @@
     xclip
     gparted
     zoom-us
+    octaveFull
     
     # rustdesk
     (pkgs.writeShellScriptBin "rustdesk" ''
