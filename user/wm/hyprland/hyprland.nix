@@ -48,8 +48,8 @@ in
       ];
 
       general = {
-        gaps_in = 5;
-        gaps_out = 5;
+        gaps_in = 1;
+        gaps_out = 10;
         border_size = 1;
         "col.active_border" = "rgba(33ccffee) rgba(00ff99ee) 45deg";
         "col.inactive_border" = "rgba(595959aa)";
@@ -170,7 +170,7 @@ in
     };
   };
 
-  # Waybar configuration
+    # Waybar configuration
   programs.waybar = {
     enable = true;
     settings = {
@@ -259,6 +259,7 @@ in
         border-radius: 10px;
         font-family: monospace;
         font-size: 14px;
+        margin: 0;  /* Reset default margins */
       }
 
       window#waybar {
@@ -282,26 +283,27 @@ in
         padding: 0 10px;
       }
 
-      /* Match right-side modules to workspaces styling */
+      /* Right-side modules with no padding on sides adjacent to separators */
       #memory, #cpu, #network, #pulseaudio, #clock, #battery {
-        padding: 0 10px;
-        color: #ffffff;           /* White text */
+        padding: 0;           /* Remove horizontal padding */
+        color: #ffffff;       /* White text */
         background: transparent;  /* Transparent background */
       }
 
-      /* Hover effect similar to active workspace */
+      /* Hover effect */
       #memory:hover, #cpu:hover, #network:hover, #pulseaudio:hover, #clock:hover, #battery:hover {
         background: rgba(51, 204, 255, 0.5); /* Cyan hover effect */
         border-bottom: 2px solid #33ccff;    /* Cyan border on hover */
       }
 
-      /* Separator styling */
+      /* Separator styling with spacing between separators */
       #custom-separator {
-        color: #33ccff;  /* Matches hover border */
-        padding: 0 5px;
+        color: #33ccff;       /* Matches hover border */
+        padding: 0 10px;      /* Adds 10px spacing on each side */
       }
     '';
   };
+
 
   # Rofi configuration
   programs.rofi = {
