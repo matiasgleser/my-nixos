@@ -6,15 +6,32 @@
     let
       # ---- SYSTEM SETTINGS ---- #
       systemSettings = {
-        system = "x86_64-linux"; # system arch
-        hostname = "nixos"; # hostname
-        profile = "work"; # select a profile defined from my profiles directory
+        system = "x86_64-linux";      # system arch
+        hostname = "nixos";           # hostname
+        profile = "personal";         # select a profile defined from my profiles directory
+        timezone = "America/Argentina/Cordoba"; # Timezone to be used in clock
+        locale = "es_AR.UTF-8";       # The locale used in keyboard for example
       };
 
       # ----- USER SETTINGS ----- #
       userSettings = rec {
+        name = "Matias";
         username = "mati"; # username
-        terminal = "alacritty"; # terminal em
+        term = "alacritty"; # terminal emulator
+        dotfilesDir = "~/.dotfiles"; # absolute path of the local repo
+        # theme = "io"; # selcted theme from my themes directory (./themes/)
+        wm = "hyprland"; # Selected window manager or desktop environment; must select one in both ./user/wm/ and ./system/wm/
+        # window manager type (hyprland or x11) translator
+        wmType = if ((wm == "hyprland") || (wm == "plasma")) then "wayland" else "x11";
+        # browser = "qutebrowser"; # Default browser; must select one from ./user/app/browser/
+        # spawnBrowser = if ((browser == "qutebrowser") && (wm == "hyprland")) then "qutebrowser-hyprprofile" else (if (browser == "qutebrowser") then "qutebrowser --qt-flag enable-gpu-rasterization --qt-flag enable-native-gpu-memory-buffers --qt-flag num-raster-threads=4" else browser); # Browser spawn command must be specail for qb, since it doesn't gpu accelerate by default (why?)
+        # defaultRoamDir = "Personal.p"; # Default org roam directory relative to ~/Org
+        # font = "JetBrainsMono Nerd Font"; # Selected font
+        # fontPkg = pkgs.nerd-fonts.jetbrains-mono; # Font package
+        font = "MesloLGS Nerd Font Mono"; # Selected font
+        fontPkg = pkgs.nerd-fonts.jetbrains-mono; # Font package
+        # font = "FiraCode Nerd Font Mono"; # Selected font
+        # fontPkg = pkgs.nerd-fonts.fira-code; # Font package
       };
 
       
@@ -23,7 +40,8 @@
       # otherwise use patched nixos-unstable nixpkgs
       pkgs = (if ((systemSettings.profile == "work") || (systemSettings.profile == "work2"))
               then
-                pkgs-stable
+                # pkgs-stable
+                pkgs-unstable
               else
                 pkgs-unstable);
 
@@ -99,6 +117,7 @@
           ]; # load configuration.nix from selected PROFILE
           specialArgs = {
             # pass config variables from above
+            inherit pkgs-stable;
             inherit systemSettings;
             inherit userSettings;
             inherit inputs;

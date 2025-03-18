@@ -84,7 +84,7 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -141,12 +141,13 @@
     docker
     go
     gcc
+    # libstdcxx5
     wget
     lunarvim
     rustup
     cargo
-    nerdfonts
-    fira-code-nerdfont
+    # nerdfonts
+    nerd-fonts.fira-code
     zoxide
     bat
     openssl
@@ -154,28 +155,31 @@
     pkg-config
     xclip
     gparted
+    pandoc
+    # arc-browser
+    julia
     zoom-us
-    octaveFull
+    # octaveFull
+    R
+    rstudio
+
     
     # rustdesk
-    (pkgs.writeShellScriptBin "rustdesk" ''
-      #!${pkgs.bash}/bin/bash
-      export GDK_BACKEND=x11
-      exec ${pkgs.rustdesk}/bin/rustdesk "$@"
-    '')
+    # (pkgs.writeShellScriptBin "rustdesk" ''
+    #   #!${pkgs.bash}/bin/bash
+    #   export GDK_BACKEND=x11
+    #   exec ${pkgs.rustdesk}/bin/rustdesk "$@"
+    # '')
     
     brave
     # Add hugo
     hugo
 
-    # Add Zed (Code Editor)
-    zed-editor
-
     # Add Spotify
     spotify
 
     # Add Discord
-    discord
+    # discord
 
     # Add Brave
     brave
@@ -187,7 +191,7 @@
     xfce.thunar
 
     teamviewer
-    obsidian
+    # obsidian
 
   ];
 

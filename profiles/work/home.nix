@@ -16,7 +16,7 @@
   
   # The configs to import
   imports = [
-    (./. + "../../../user/apps/terminal"+("/"+userSettings.terminal)+".nix") # My default terminal selected from flake
+    (./. + "../../../user/apps/term"+("/"+userSettings.term)+".nix") # My default terminal selected from flake
   ];
 
   # Packages to use

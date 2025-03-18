@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, userSettings, ... }:
 
 {
   home.packages = with pkgs; [
@@ -26,12 +26,30 @@
       };
     };
 
-    # Font config
+    # # Font config
     font = {
       size = 11.0;
-      normal.family = "FiraCode Nerd Font Mono";
-      bold.family = "FiraCode Nerd Font";
-      italic.family = "FiraCode Nerd Font";
+      normal = {
+        family = userSettings.font;
+        # family = if (lib.hasSuffix "Mono" userSettings.font) 
+        #          then userSettings.font 
+        #          else userSettings.font + " Mono";  # Dynamically append "Mono" if not present
+        style = "Regular";
+      };
+      bold = {
+         family = userSettings.font;
+         # family = if (lib.hasSuffix "Mono" userSettings.font) 
+         #         then userSettings.font 
+         #         else userSettings.font + " Mono";
+        style = "Bold";
+      };
+      italic = {
+        family = userSettings.font;
+        # family = if (lib.hasSuffix "Mono" userSettings.font) 
+        #          then userSettings.font 
+        #          else userSettings.font + " Mono";
+        style = "Italic";
+      };
     }; 
 
     # Colors
