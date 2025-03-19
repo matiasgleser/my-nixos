@@ -33,7 +33,7 @@ in
       monitor = "eDP-1, 1920x1080@60, 0x0, 1";
 
       exec-once = [
-        "MOZ_ENABLE_WAYLAND=1 firefox"
+        # "MOZ_ENABLE_WAYLAND=1 firefox"
         "chromium --ozone-platform-hint=auto"
         "waybar"
       ];
@@ -179,7 +179,8 @@ in
         position = "top";
         height = 30;
         modules-left = [ "hyprland/workspaces" ];
-        modules-center = [ "hyprland/window" ];
+        # modules-center = [ "hyprland/window" ];
+        modules-center = [ "custom/window" ];       # Custom display of app name
         modules-right = [ "memory" "custom/separator" "cpu" "custom/separator" "network" "custom/separator" "pulseaudio" "custom/separator" "clock" "custom/separator" "battery" ];
 
         "hyprland/workspaces" = {
@@ -198,6 +199,25 @@ in
           format = "|";
           interval = "once";  # Static, no updates needed
           tooltip = false;    # No tooltip for separator
+        };
+
+        "custom/window" = {
+          format = "{}";  # Display the output of the script
+          interval = 1;   # Update every second
+          exec = pkgs.writeShellScript "window-name" ''
+            #!/bin/sh
+            # Get the active window info from hyprctl
+            WINDOW=$(hyprctl activewindow -j | ${pkgs.jq}/bin/jq -r '.class')
+          
+            # Map window class to simplified name
+            case "$WINDOW" in
+              "brave-browser") echo "Brave" ;;
+              "firefox") echo "Firefox" ;;
+              "chromium") echo "Chromium" ;;
+              *) echo "$WINDOW" ;;  # Fallback to class name if not a browser
+            esac
+          '';
+          tooltip = false;  # Optional: disable tooltip if not needed
         };
 
         memory = {
@@ -285,7 +305,7 @@ in
 
       /* Right-side modules with no padding on sides adjacent to separators */
       #memory, #cpu, #network, #pulseaudio, #clock, #battery {
-        padding: 0;           /* Remove horizontal padding */
+        padding: 3;           /* Remove horizontal padding */
         color: #ffffff;       /* White text */
         background: transparent;  /* Transparent background */
       }
@@ -299,7 +319,7 @@ in
       /* Separator styling with spacing between separators */
       #custom-separator {
         color: #33ccff;       /* Matches hover border */
-        padding: 0 10px;      /* Adds 10px spacing on each side */
+        padding: 0 1px;      /* Adds 10px spacing on each side */
       }
     '';
   };
