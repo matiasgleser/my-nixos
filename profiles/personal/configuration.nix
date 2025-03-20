@@ -25,7 +25,8 @@
 
   # Timezone and locale
   time.timeZone = systemSettings.timezone;
-  i18n.defaultLocale = systemSettings.locale;
+  i18n.defaultLocale = systemSettings.systemLang;
+  # i18n.defaultLocale = systemSettings.locale;
   i18n.extraLocaleSettings = {
     LC_ADDRESS = systemSettings.locale;
     LC_IDENTIFICATION = systemSettings.locale;
@@ -36,6 +37,9 @@
     LC_PAPER = systemSettings.locale;
     LC_TELEPHONE = systemSettings.locale;
     LC_TIME = systemSettings.locale;
+
+    LC_MESSAGES = systemSettings.systemLang;
+    LANG = systemSettings.systemLang;
   };
 
   # User account
@@ -76,12 +80,12 @@
 
   # Basic X server for compatibility (optional, remove if pure Wayland is desired)
   services.xserver.enable = true;
-  services.xserver.xkb.layout = "us,es";
+  services.xserver.xkb.layout = "${systemSettings.primaryKbLang},${systemSettings.secondaryKbLang}";
 
   # Display manager (using sddm, but you could use others like gdm)
   services.displayManager.sddm.enable = true;
   services.displayManager.sddm.wayland.enable = true;
-  services.displayManager.sddm.autoNumlock = true;
+  services.displayManager.sddm.autoNumlock = false;
 
   # Enable sound with pipewire
   services.pulseaudio.enable = false;

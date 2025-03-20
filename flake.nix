@@ -6,11 +6,14 @@
     let
       # ---- SYSTEM SETTINGS ---- #
       systemSettings = {
-        system = "x86_64-linux";      # system arch
-        hostname = "nixos";           # hostname
-        profile = "personal";         # select a profile defined from my profiles directory
-        timezone = "America/Argentina/Cordoba"; # Timezone to be used in clock
-        locale = "es_AR.UTF-8";       # The locale used in keyboard for example
+        system = "x86_64-linux";                      # system arch
+        hostname = "nixos";                           # hostname
+        profile = "personal";                         # select a profile defined from my profiles directory
+        timezone = "America/Argentina/Cordoba";       # Timezone to be used in clock
+        locale = "es_AR.UTF-8";                       # The locale used in time settings for example
+        systemLang = "en_US.UTF-8";                   # The language used in the system
+        primaryKbLang = "es";                         # The primary language used in keyboard
+        secondaryKbLang = "us";                       # The secondary language used in keyboard
       };
 
       # ----- USER SETTINGS ----- #
@@ -103,6 +106,7 @@
           extraSpecialArgs = {
             # pass config variables from above
             inherit userSettings;
+            inherit systemSettings;
           };
         };
       };

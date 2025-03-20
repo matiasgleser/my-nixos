@@ -86,7 +86,7 @@ in
       };
 
       input = {
-        kb_layout = "us";
+        kb_layout = "${systemSettings.primaryKbLang},${systemSettings.secondaryKbLang}";
         follow_mouse = 1;
         sensitivity = 0;
         touchpad = {
@@ -105,6 +105,10 @@ in
         "$mainMod, R, exec, $menu"
         "$mainMod, P, pseudo,"
         "$mainMod, J, togglesplit,"
+
+        # Language switching
+        # "$mainMod, L, exec, hyprctl switchxkblayout ${systemSettings.primaryKbLang} ${systemSettings.secondaryKbLang}"
+        "$mainMod, L, exec, hyprctl switchxkblayout at-translated-set-2-keyboard next"  # Toggle layout
 
         "$mainMod, left, movefocus, l"
         "$mainMod, right, movefocus, r"
@@ -214,6 +218,7 @@ in
               "brave-browser") echo "Brave" ;;
               "firefox") echo "Firefox" ;;
               "chromium") echo "Chromium" ;;
+              null) echo "" ;;
               *) echo "$WINDOW" ;;  # Fallback to class name if not a browser
             esac
           '';
@@ -237,8 +242,10 @@ in
         };
 
         network = {
-          format-wifi = "📶 {essid}";
-          format-ethernet = "📶 {ipaddr}";
+          format-wifi = "📶";
+          # format-wifi = "📶 {essid}";
+          format-ethernet = "📶";
+          # format-ethernet = "📶 {ipaddr}";
           format-disconnected = "🔌";
           interval = 5;
           "on-click" = "hyprctl dispatch exec 'nm-applet' && hyprctl dispatch togglefloating class:nm-applet";
@@ -324,10 +331,19 @@ in
     '';
   };
 
-
   # Rofi configuration
   programs.rofi = {
     enable = true;
+    # package = pkgs.rofi.override { plugins = [ pkgs.rofi-calc ]; };  # Include rofi-calc plugin
+    # extraConfig = {
+    #   modi = "drun,calc";              # Enable drun and calc modes
+    #   font = "monospace 14";
+    #   show-icons = true;
+    #   kb-row-up = "Up,Control+p";      # Scroll up with Up arrow or Ctrl+p
+    #   kb-row-down = "Down,Control+n";  # Scroll down with Down arrow or Ctrl+n
+    #   kb-accept-entry = "Return";      # Accept selection with Enter
+    # };
+
     theme = {
       configuration = {
         modi = "drun";
@@ -336,46 +352,50 @@ in
       };
 
       "*" = {
-        "background-color" = "rgba(26, 26, 26, 0.9)";  # Matches Waybar background
-        "text-color" = "#ffffff";                      # White text, matches Waybar
-        "border-color" = "#33ccff";                    # Cyan, matches hover/active border
+        "background-color" = "rgba(26, 26, 26, 0.9)";  # Dark gray background
+        "text-color" = "#ffffff";                      # White text for readability
+        "border-color" = "#33ccff";                    # Cyan borders to match Wayland tabs
       };
 
       window = {
         transparency = "real";
-        border = 2;
-        "border-color" = "#33ccff";                    # Cyan border
-        "border-radius" = "10px";
+        border = 2;                                    # 2px border
+        "border-color" = "#33ccff";                    # Cyan border matching Wayland tabs
+        "border-radius" = "10px";                      # Rounded corners like Waybar
         width = "600px";
       };
 
       entry = {
-        "background-color" = "rgba(51, 204, 255, 0.1)";  # Light cyan, subtle highlight
+        "background-color" = "rgba(26, 26, 26, 0.9)";  # Dark background for consistency
         padding = "10px";
-        "text-color" = "#ffffff";                         # White text
+        "text-color" = "#ffffff";                      # White text
+        "border" = "2px";                              # Add a 2px border
+        "border-color" = "#33ccff";                    # Cyan border for emphasis
       };
 
       element = {
         "border-radius" = "5px";
         padding = "5px";
-        "background-color" = "rgba(26, 26, 26, 0.9)";  # Matches main background
+        "background-color" = "rgba(26, 26, 26, 0.9)";  # Dark background
         "text-color" = "#ffffff";                      # White text
       };
 
       "element selected" = {
-        "background-color" = "rgba(51, 204, 255, 0.5)";  # Cyan highlight, matches Waybar hover
-        "text-color" = "#ffffff";                         # White text
+        "background-color" = "rgba(51, 204, 255, 0.5)";  # Cyan highlight matching Waybar
+        "text-color" = "#ffffff";                        # White text for readability
+        "border" = "2px";                                # 2px border for prominence
+        "border-color" = "#33ccff";                      # Cyan border
       };
 
       "element-icon" = {
-        padding = "0 5px 0 0";  # Right padding to add space between icon and text
+        padding = "0 5px 0 0";                           # Space between icon and text
         "background-color" = "transparent";
       };
 
       "element-text" = {
-        padding = "0 0 0 5px";  # Left padding to ensure spacing from icon
+        padding = "0 0 0 5px";                           # Space from icon
         "background-color" = "transparent";
-        "text-color" = "#ffffff";  # White text
+        "text-color" = "#ffffff";                        # White text
       };
     };
   };
