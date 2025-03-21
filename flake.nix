@@ -22,7 +22,7 @@
         username = "mati"; # username
         term = "alacritty"; # terminal emulator
         dotfilesDir = "~/.dotfiles"; # absolute path of the local repo
-        # theme = "io"; # selcted theme from my themes directory (./themes/)
+        theme = "io"; # selcted theme from my themes directory (./themes/)
         wm = "hyprland"; # Selected window manager or desktop environment; must select one in both ./user/wm/ and ./system/wm/
         # window manager type (hyprland or x11) translator
         wmType = if ((wm == "hyprland") || (wm == "plasma")) then "wayland" else "x11";
