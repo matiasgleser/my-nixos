@@ -14,8 +14,12 @@
   
   # The configs to import
   imports = [
-    # (./. + "../../../user/apps/term"+("/"+userSettings.term)+".nix") # My default terminal selected from flake
+    
+    (./. + "../../../user/apps/term"+("/"+userSettings.term)+".nix") # My default terminal selected from flake
     (./. + "../../../user/wm"+("/"+userSettings.wm+"/"+userSettings.wm)+".nix") # My window manager selected from flake
+    (./. + "../../../user/apps/file-manager"+("/"+userSettings.fileManager)+".nix") # My file manager selected from flake
+    ../../user/apps/git/git.nix # My git config
+
   ];
 
   # Packages to use

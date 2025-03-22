@@ -4,9 +4,9 @@ let
   pkgs-hyprland = inputs.hyprland.inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system};
 in
 {
-  imports = [
-    ../../../user/apps/term/alacritty.nix
-  ];
+  # imports = [
+  #   # ("../../../user/apps/term"+("/"+userSettings.term)+".nix")
+  # ];
 
   # Packages to install
   home.packages = with pkgs; [
@@ -14,8 +14,8 @@ in
     waybar
     rofi
     kitty
-    xfce.thunar
-    kdePackages.dolphin
+    # ${userSettings.fileManager}       # File manager
+      # kdePackages.dolphin
     wireplumber                       # For volume control
     brightnessctl                     # For brightness control
     playerctl                         # For media control
@@ -38,8 +38,8 @@ in
         "waybar"
       ];
 
-      "$terminal" = "alacritty";
-      "$fileManager" = "dolphin";
+      "$terminal" = userSettings.term;
+      "$fileManager" = userSettings.fileManager;
       "$menu" = "rofi -show drun";
 
       env = [
@@ -167,6 +167,9 @@ in
 
       # Make nm-applet float when opened
       windowrulev2 = [
+        "float, class:${userSettings.fileManager}"          # Make Dolphin float by default
+        "size 800 600, class:${userSettings.fileManager}"   # Optional: Set default size
+        "center, class:${userSettings.fileManager}"
         "float, class:nm-applet"
         "size 600 400, class:nm-applet"  # Optional: Set a default size
         "center, class:nm-applet"        # Optional: Center it

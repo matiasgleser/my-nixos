@@ -18,8 +18,9 @@
 
       # ----- USER SETTINGS ----- #
       userSettings = rec {
-        name = "Matias";
+        name = "Matias Gleser";
         username = "mati"; # username
+        email = "matiasgleser1999@gmail.com";
         term = "alacritty"; # terminal emulator
         dotfilesDir = "~/.dotfiles"; # absolute path of the local repo
         theme = "io"; # selcted theme from my themes directory (./themes/)
@@ -33,8 +34,7 @@
         # fontPkg = pkgs.nerd-fonts.jetbrains-mono; # Font package
         font = "MesloLGS Nerd Font Mono"; # Selected font
         fontPkg = pkgs.nerd-fonts.jetbrains-mono; # Font package
-        # font = "FiraCode Nerd Font Mono"; # Selected font
-        # fontPkg = pkgs.nerd-fonts.fira-code; # Font package
+        fileManager = "nautilus";
       };
 
       
