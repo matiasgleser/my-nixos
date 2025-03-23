@@ -12,14 +12,17 @@ in
   home.packages = with pkgs; [
     hyprland
     waybar
-    rofi
+    wofi
     kitty
-    # ${userSettings.fileManager}       # File manager
-      # kdePackages.dolphin
     wireplumber                       # For volume control
     brightnessctl                     # For brightness control
     playerctl                         # For media control
     hyprpaper                         # For wallpaper control
+    hypridle                          # For idleness control
+    hyprlock                          # For lock screen
+    hyprshot                          # For screenshots with mouse
+    swaynotificationcenter            # For custom notifications
+    libnotify
     gnome-system-monitor              # For RAM/CPU monitoring
     networkmanagerapplet              # For network management GUI
     pavucontrol                       # For volume control GUI
@@ -36,11 +39,15 @@ in
         # "MOZ_ENABLE_WAYLAND=1 firefox"
         "chromium --ozone-platform-hint=auto"
         "waybar"
+        "swaync"
+        "hypridle"
+        "hyprpaper"
       ];
 
       "$terminal" = userSettings.term;
       "$fileManager" = userSettings.fileManager;
-      "$menu" = "rofi -show drun";
+      "$menu" = "wofi --show drun";
+      "$screenshot_dir" = "~/Pictures";
 
       env = [
         "XCURSOR_SIZE,24"
@@ -49,7 +56,7 @@ in
 
       general = {
         gaps_in = 1;
-        gaps_out = 10;
+        gaps_out = 5;
         border_size = 1;
         "col.active_border" = "rgba(33ccffee) rgba(00ff99ee) 45deg";
         "col.inactive_border" = "rgba(595959aa)";
@@ -107,8 +114,11 @@ in
         "$mainMod, J, togglesplit,"
 
         # Language switching
-        # "$mainMod, L, exec, hyprctl switchxkblayout ${systemSettings.primaryKbLang} ${systemSettings.secondaryKbLang}"
         "$mainMod, L, exec, hyprctl switchxkblayout at-translated-set-2-keyboard next"  # Toggle layout
+
+        # Screenshots
+        ", PRINT, exec, hyprshot -m output -m active -o $screenshot_dir"
+        "shift, PRINT, exec, hyprshot -m region -z -o $screenshot_dir"
 
         "$mainMod, left, movefocus, l"
         "$mainMod, right, movefocus, r"
@@ -177,7 +187,488 @@ in
     };
   };
 
-    # Waybar configuration
+  # Waybar configuration
+  # programs.waybar = {
+  #   enable = true;
+  #   # package = pkgs.waybar.overrideAttrs (oldAttrs: {
+  #   #   postPatch = ''
+  #   #     # use hyprctl to switch workspaces
+  #   #     sed -i 's/zext_workspace_handle_v1_activate(workspace_handle_);/const std::string command = "hyprctl dispatch focusworkspaceoncurrentmonitor " + std::to_string(id());\n\tsystem(command.c_str());/g' src/modules/wlr/workspace_manager.cpp
+  #   #     sed -i 's/gIPC->getSocket1Reply("dispatch workspace " + std::to_string(id()));/gIPC->getSocket1Reply("dispatch focusworkspaceoncurrentmonitor " + std::to_string(id()));/g' src/modules/hyprland/workspaces.cpp
+  #   #   '';
+  #   #   patches = [./patches/waybarpaupdate.patch ./patches/waybarbatupdate.patch];
+  #   # });
+  #   settings = {
+  #     mainBar = {
+  #       layer = "top";
+  #       position = "top";
+  #       height = 35;
+  #       margin = "7 7 3 7";
+  #       spacing = 2;
+
+  #       modules-left = [ "group/power" "group/battery" "group/backlight" "group/cpu" "group/memory" "group/pulseaudio" "keyboard-state" ];
+  #       modules-center = [ "custom/hyprprofile" "hyprland/workspaces" ];
+  #       modules-right = [ "group/time" "idle_inhibitor" "tray" ];
+
+  #       "custom/os" = {
+  #         format = " {} ";
+  #         exec = ''echo ""'';
+  #         interval = "once";
+  #         on-click = "nwggrid-wrapper";
+  #         tooltip = false;
+  #       };
+  #       "group/power" = {
+  #         orientation = "horizontal";
+  #         drawer = {
+  #           transition-duration = 500;
+  #           children-class = "not-power";
+  #           transition-left-to-right = true;
+  #         };
+  #         modules = [
+  #           "custom/os"
+  #           "custom/hyprprofileicon"
+  #           "custom/lock"
+  #           "custom/quit"
+  #           "custom/power"
+  #           "custom/reboot"
+  #         ];
+  #       };
+  #       "custom/quit" = {
+  #         format = "󰍃";
+  #         tooltip = false;
+  #         on-click = "hyprctl dispatch exit";
+  #       };
+  #       "custom/lock" = {
+  #         format = "󰍁";
+  #         tooltip = false;
+  #         on-click = "hyprlock";
+  #       };
+  #       "custom/reboot" = {
+  #         format = "󰜉";
+  #         tooltip = false;
+  #         on-click = "reboot";
+  #       };
+  #       "custom/power" = {
+  #         format = "󰐥";
+  #         tooltip = false;
+  #         on-click = "shutdown now";
+  #       };
+  #       "custom/hyprprofileicon" = {
+  #         format = "󱙋";
+  #         on-click = "hyprprofile-dmenu";
+  #         tooltip = false;
+  #       };
+  #       "custom/hyprprofile" = {
+  #         format = " {}";
+  #         exec = ''cat ~/.hyprprofile'';
+  #         interval = 3;
+  #         on-click = "hyprprofile-dmenu";
+  #       };
+  #       "keyboard-state" = {
+  #         numlock = true;
+  #         format = "{icon}";
+  #         format-icons = {
+  #           locked = "󰎠 ";
+  #           unlocked = "󱧓 ";
+  #         };
+  #       };
+  #       "hyprland/workspaces" = {
+  #         format = "{icon}";
+  #         format-icons = {
+  #           "1" = "󱚌";
+  #           "2" = "󰖟";
+  #           "3" = "";
+  #           "4" = "󰎄";
+  #           "5" = "󰋩";
+  #           "6" = "";
+  #           "7" = "󰄖";
+  #           "8" = "󰑴";
+  #           "9" = "󱎓";
+  #           scratch_term = "_";
+  #           scratch_ranger = "_󰴉";
+  #           scratch_music = "_";
+  #           scratch_btm = "_";
+  #           scratch_pavucontrol = "_󰍰";
+  #         };
+  #         on-click = "activate";
+  #         on-scroll-up = "hyprnome";
+  #         on-scroll-down = "hyprnome --previous";
+  #         all-outputs = false;
+  #         active-only = false;
+  #         ignore-workspaces = ["scratch" "-"];
+  #         show-special = false;
+  #       };
+
+  #       "idle_inhibitor" = {
+  #         format = "{icon}";
+  #         format-icons = {
+  #           activated = "󰅶";
+  #           deactivated = "󰾪";
+  #         };
+  #       };
+  #       tray = {
+  #         spacing = 10;
+  #       };
+  #       "clock#time" = {
+  #         interval = 1;
+  #         format = "{:%I:%M:%S %p}";
+  #         timezone = "America/Chicago";
+  #         tooltip-format = ''
+  #           <big>{:%Y %B}</big>
+  #           <tt><small>{calendar}</small></tt>'';
+  #       };
+  #       "clock#date" = {
+  #         interval = 1;
+  #         format = "{:%a %Y-%m-%d}";
+  #         timezone = "America/Chicago";
+  #         tooltip-format = ''
+  #           <big>{:%Y %B}</big>
+  #           <tt><small>{calendar}</small></tt>'';
+  #       };
+  #       "group/time" = {
+  #         orientation = "horizontal";
+  #         drawer = {
+  #           transition-duration = 500;
+  #           transition-left-to-right = false;
+  #         };
+  #         modules = [ "clock#time" "clock#date" ];
+  #       };
+
+  #       cpu = { format = "󰍛"; };
+  #       "cpu#text" = { format = "{usage}%"; };
+  #       "group/cpu" = {
+  #         orientation = "horizontal";
+  #         drawer = {
+  #           transition-duration = 500;
+  #           transition-left-to-right = true;
+  #         };
+  #         modules = [ "cpu" "cpu#text" ];
+  #       };
+
+  #       memory = { format = ""; };
+  #       "memory#text" = { format = "{}%"; };
+  #       "group/memory" = {
+  #         orientation = "horizontal";
+  #         drawer = {
+  #           transition-duration = 500;
+  #           transition-left-to-right = true;
+  #         };
+  #         modules = [ "memory" "memory#text" ];
+  #       };
+
+  #       backlight = {
+  #         format = "{icon}";
+  #         format-icons = [ "" "" "" "" "" "" "" "" "" ];
+  #       };
+  #       "backlight#text" = { format = "{percent}%"; };
+  #       "group/backlight" = {
+  #         orientation = "horizontal";
+  #         drawer = {
+  #           transition-duration = 500;
+  #           transition-left-to-right = true;
+  #         };
+  #         modules = [ "backlight" "backlight#text" ];
+  #       };
+
+  #       battery = {
+  #         states = {
+  #           good = 75;
+  #           warning = 30;
+  #           critical = 15;
+  #         };
+  #         full-at = 80;
+  #         format = "<span size='15000' foreground='#33ccff'>{icon}</span>";
+  #         format-charging = "<span size='15000' foreground='#33ccff'>󰂄</span>";
+  #         format-plugged = "<span size='15000' foreground='#33ccff'>󰂄</span>";
+  #         format-full = "<span size='15000' foreground='#33ccff'>󰁹</span>";
+  #         format-icons = [ "󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹" ];
+  #         interval = 10;
+  #         tooltip-format = "{time}\nStatus: {powerProfile}";
+  #         tooltip = true;
+  #       };
+  #       "battery#text" = {
+  #         states = {
+  #           good = 75;
+  #           warning = 30;
+  #           critical = 15;
+  #         };
+  #         full-at = 80;
+  #         format = "{capacity}%";
+  #       };
+  #       "group/battery" = {
+  #         orientation = "horizontal";
+  #         drawer = {
+  #           transition-duration = 500;
+  #           transition-left-to-right = true;
+  #         };
+  #         modules = [ "battery" "battery#text" ];
+  #       };
+  #       pulseaudio = {
+  #         scroll-step = 1;
+  #         format = "<span size='15000' foreground='#33ccff'>{icon}</span>";
+  #         format-bluetooth = "<span size='15000' foreground='#33ccff'>{icon}</span>";
+  #         format-bluetooth-muted = "<span size='15000' foreground='#33ccff'>󰸈</span>";
+  #         format-muted = "<span size='15000' foreground='#33ccff'>󰸈</span>";
+  #         format-source = "<span size='15000' foreground='#33ccff'></span>";
+  #         format-source-muted = "<span size='15000' foreground='#33ccff'></span>";
+  #         format-icons = {
+  #           headphone = "";
+  #           hands-free = "";
+  #           headset = "";
+  #           phone = "";
+  #           portable = "";
+  #           car = "";
+  #           default = [ "" "" "" ];
+  #         };
+  #         on-click = "hyprctl dispatch togglespecialworkspace scratch_pavucontrol; if hyprctl clients | grep pavucontrol; then echo 'scratch_ranger respawn not needed'; else pavucontrol; fi";
+  #       };
+  #       "pulseaudio#text" = {
+  #         scroll-step = 1;
+  #         format = "{volume}%";
+  #         format-bluetooth = "{volume}%";
+  #         format-bluetooth-muted = "";
+  #         format-muted = "";
+  #         format-source = "{volume}%";
+  #         format-source-muted = "";
+  #         on-click = "hyprctl dispatch togglespecialworkspace scratch_pavucontrol; if hyprctl clients | grep pavucontrol; then echo 'scratch_ranger respawn not needed'; else pavucontrol; fi";
+  #       };
+  #       "group/pulseaudio" = {
+  #         orientation = "horizontal";
+  #         drawer = {
+  #           transition-duration = 500;
+  #           transition-left-to-right = true;
+  #         };
+  #         modules = [ "pulseaudio" "pulseaudio#text" ];
+  #       };
+  #     };
+  #   };
+  #   style = ''
+  #     * {
+  #       font-family: FontAwesome, "MesloLGS Nerd Font Mono";
+  #       font-size: 18px;
+  #       font-weight: normal;
+  #     }
+
+  #     window#waybar {
+  #       background-color: rgba(26, 26, 26, 0.9);
+  #       border-radius: 8px;
+  #       color: #ffffff;
+  #       transition-property: background-color;
+  #       transition-duration: 0.2s;
+  #     }
+
+  #     tooltip {
+  #       color: #ffffff;
+  #       background-color: rgba(26, 26, 26, 0.9);
+  #       border-style: solid;
+  #       border-width: 3px;
+  #       border-radius: 8px;
+  #       border-color: #ff5555;
+  #     }
+
+  #     tooltip * {
+  #       color: #ffffff;
+  #       background-color: rgba(26, 26, 26, 0.0);
+  #     }
+
+  #     window > box {
+  #       border-radius: 8px;
+  #       opacity: 0.94;
+  #     }
+
+  #     window#waybar.hidden {
+  #       opacity: 0.2;
+  #     }
+
+  #     button {
+  #       border: none;
+  #     }
+
+  #     #custom-hyprprofile {
+  #       color: #33ccff;
+  #     }
+
+  #     button:hover {
+  #       background: inherit;
+  #     }
+
+  #     #workspaces button {
+  #       padding: 0px 6px;
+  #       background-color: transparent;
+  #       color: #cccccc;
+  #     }
+
+  #     #workspaces button:hover {
+  #       color: #ffffff;
+  #     }
+
+  #     #workspaces button.active {
+  #       color: #ff5555;
+  #     }
+
+  #     #workspaces button.focused {
+  #       color: #33ccff;
+  #     }
+
+  #     #workspaces button.visible {
+  #       color: #ffffff;
+  #     }
+
+  #     #workspaces button.urgent {
+  #       color: #ff5555;
+  #     }
+
+  #     #battery,
+  #     #cpu,
+  #     #memory,
+  #     #disk,
+  #     #temperature,
+  #     #backlight,
+  #     #network,
+  #     #pulseaudio,
+  #     #wireplumber,
+  #     #custom-media,
+  #     #tray,
+  #     #mode,
+  #     #idle_inhibitor,
+  #     #scratchpad,
+  #     #custom-hyprprofileicon,
+  #     #custom-quit,
+  #     #custom-lock,
+  #     #custom-reboot,
+  #     #custom-power,
+  #     #mpd {
+  #       padding: 0 3px;
+  #       color: #ffffff;
+  #       border: none;
+  #       border-radius: 8px;
+  #     }
+
+  #     #custom-hyprprofileicon,
+  #     #custom-quit,
+  #     #custom-lock,
+  #     #custom-reboot,
+  #     #custom-power,
+  #     #idle_inhibitor {
+  #       background-color: transparent;
+  #       color: #cccccc;
+  #     }
+
+  #     #custom-hyprprofileicon:hover,
+  #     #custom-quit:hover,
+  #     #custom-lock:hover,
+  #     #custom-reboot:hover,
+  #     #custom-power:hover,
+  #     #idle_inhibitor:hover {
+  #       color: #ffffff;
+  #     }
+
+  #     #clock, #tray, #idle_inhibitor {
+  #       padding: 0 5px;
+  #     }
+
+  #     #window,
+  #     #workspaces {
+  #       margin: 0 6px;
+  #     }
+
+  #     .modules-left > widget:first-child > #workspaces {
+  #       margin-left: 0;
+  #     }
+
+  #     .modules-right > widget:last-child > #workspaces {
+  #       margin-right: 0;
+  #     }
+
+  #     #clock {
+  #       color: #33ccff;
+  #     }
+
+  #     #battery {
+  #       color: #33ccff;
+  #     }
+
+  #     #battery.charging, #battery.plugged {
+  #       color: #33ccff;
+  #     }
+
+  #     @keyframes blink {
+  #       to {
+  #         background-color: #ffffff;
+  #         color: #000000;
+  #       }
+  #     }
+
+  #     #battery.critical:not(.charging) {
+  #       background-color: #ff5555;
+  #       color: #ffffff;
+  #       animation-name: blink;
+  #       animation-duration: 0.5s;
+  #       animation-timing-function: linear;
+  #       animation-iteration-count: infinite;
+  #       animation-direction: alternate;
+  #     }
+
+  #     label:focus {
+  #       background-color: rgba(26, 26, 26, 1.0);
+  #     }
+
+  #     #cpu {
+  #       color: #33ccff;
+  #     }
+
+  #     #memory {
+  #       color: #33ccff;
+  #     }
+
+  #     #disk {
+  #       color: #33ccff;
+  #     }
+
+  #     #backlight {
+  #       color: #33ccff;
+  #     }
+
+  #     label.numlock {
+  #       color: #cccccc;
+  #     }
+
+  #     label.numlock.locked {
+  #       color: #33ccff;
+  #     }
+
+  #     #pulseaudio {
+  #       color: #33ccff;
+  #     }
+
+  #     #pulseaudio.muted {
+  #       color: #cccccc;
+  #     }
+
+  #     #tray > .passive {
+  #       -gtk-icon-effect: dim;
+  #     }
+
+  #     #tray > .needs-attention {
+  #       -gtk-icon-effect: highlight;
+  #     }
+
+  #     #idle_inhibitor {
+  #       color: #cccccc;
+  #     }
+
+  #     #idle_inhibitor.activated {
+  #       color: #33ccff;
+  #     }
+
+  #     /* Adjust icon size for modules with Pango markup */
+  #     #battery span,
+  #     #pulseaudio span {
+  #       font-size: 15px;
+  #     }
+  #   '';
+  # };
+
   programs.waybar = {
     enable = true;
     settings = {
@@ -272,7 +763,8 @@ in
         clock = {
           format = "{:%H:%M}";
           tooltip = true;
-          "tooltip-format" = "{:%Y-%m-%d %H:%M}";
+          timezone = systemSettings.timezone;
+          "tooltip-format" = "{:%Y-%m-%d %H:%M (%Z)}";
         };
 
         battery = {
@@ -334,74 +826,283 @@ in
     '';
   };
 
-  # Rofi configuration
-  programs.rofi = {
+  # Wofi configuration
+  programs.wofi = {
     enable = true;
-    # package = pkgs.rofi.override { plugins = [ pkgs.rofi-calc ]; };  # Include rofi-calc plugin
-    # extraConfig = {
-    #   modi = "drun,calc";              # Enable drun and calc modes
-    #   font = "monospace 14";
-    #   show-icons = true;
-    #   kb-row-up = "Up,Control+p";      # Scroll up with Up arrow or Ctrl+p
-    #   kb-row-down = "Down,Control+n";  # Scroll down with Down arrow or Ctrl+n
-    #   kb-accept-entry = "Return";      # Accept selection with Enter
-    # };
+    settings = {
+      show = "drun";              # Default to application launcher mode
+      width = 600;                # Match Rofi’s 600px width
+      height = 400;               # Reasonable height (adjustable)
+      always_parse_args = true;   # Allow custom input handling
+      show_all = false;           # Only show relevant apps
+      term = "alacritty";         # Terminal to use if needed
+      insensitive = true;         # Case-insensitive search
+      allow_images = true;        # Show icons (equivalent to Rofi’s show-icons)
+    };
+    style = ''
+      * {
+        font-family: 'CaskaydiaCove Nerd Font', monospace;
+        font-size: 18px;
+        background-color: rgba(26, 26, 26, 0.9);  /* Dark gray background */
+        color: #ffffff;                           /* White text */
+      }
 
-    theme = {
-      configuration = {
-        modi = "drun";
-        font = "monospace 14";
-        "show-icons" = true;
-      };
+      /* Window */
+      window {
+        margin: 0px;
+        padding: 10px;
+        border: 2px solid #33ccff;               /* Cyan border */
+        border-radius: 8px;                      /* Rounded corners */
+        background-color: rgba(26, 26, 26, 0.9); /* Dark gray background */
+      }
 
-      "*" = {
-        "background-color" = "rgba(26, 26, 26, 0.9)";  # Dark gray background
-        "text-color" = "#ffffff";                      # White text for readability
-        "border-color" = "#33ccff";                    # Cyan borders to match Wayland tabs
-      };
+      /* Inner Box */
+      #inner-box {
+        margin: 5px;
+        padding: 10px;
+        border: none;
+        background-color: rgba(26, 26, 26, 0.9); /* Dark gray background */
+      }
 
-      window = {
-        transparency = "real";
-        border = 2;                                    # 2px border
-        "border-color" = "#33ccff";                    # Cyan border matching Wayland tabs
-        "border-radius" = "10px";                      # Rounded corners like Waybar
-        width = "600px";
-      };
+      /* Outer Box */
+      #outer-box {
+        margin: 5px;
+        padding: 10px;
+        border: none;
+        background-color: rgba(26, 26, 26, 0.9); /* Dark gray background */
+      }
 
-      entry = {
-        "background-color" = "rgba(26, 26, 26, 0.9)";  # Dark background for consistency
-        padding = "10px";
-        "text-color" = "#ffffff";                      # White text
-        "border" = "2px";                              # Add a 2px border
-        "border-color" = "#33ccff";                    # Cyan border for emphasis
-      };
+      /* Scroll */
+      #scroll {
+        margin: 0px;
+        padding: 10px;
+        border: none;
+        background-color: rgba(26, 26, 26, 0.9); /* Dark gray background */
+      }
 
-      element = {
-        "border-radius" = "5px";
-        padding = "5px";
-        "background-color" = "rgba(26, 26, 26, 0.9)";  # Dark background
-        "text-color" = "#ffffff";                      # White text
-      };
+      /* Input */
+      #input {
+        margin: 5px 20px;
+        padding: 10px;
+        border: 2px solid #33ccff;               /* Cyan border */
+        border-radius: 0.1em;                    /* Slightly rounded */
+        color: #ffffff;                          /* White text */
+        background-color: rgba(26, 26, 26, 0.9); /* Dark gray background */
+      }
 
-      "element selected" = {
-        "background-color" = "rgba(51, 204, 255, 0.5)";  # Cyan highlight matching Waybar
-        "text-color" = "#ffffff";                        # White text for readability
-        "border" = "2px";                                # 2px border for prominence
-        "border-color" = "#33ccff";                      # Cyan border
-      };
+      #input image {
+        border: none;
+        color: #33ccff;                          /* Cyan for icons */
+      }
 
-      "element-icon" = {
-        padding = "0 5px 0 0";                           # Space between icon and text
-        "background-color" = "transparent";
-      };
+      #input * {
+        outline: 4px solid #33ccff !important;   /* Cyan outline */
+      }
 
-      "element-text" = {
-        padding = "0 0 0 5px";                           # Space from icon
-        "background-color" = "transparent";
-        "text-color" = "#ffffff";                        # White text
-      };
+      /* Text */
+      #text {
+        margin: 5px;
+        border: none;
+        color: #ffffff;                          /* White text */
+        background-color: transparent;
+      }
+
+      #entry {
+        background-color: rgba(26, 26, 26, 0.9); /* Dark gray background */
+        padding: 5px;
+        border-radius: 5px;                      /* Rounded corners */
+      }
+
+      #entry arrow {
+        border: none;
+        color: #33ccff;                          /* Cyan arrow */
+      }
+
+      /* Selected Entry */
+      #entry:selected {
+        border: 0.11em solid #33ccff;            /* Cyan border */
+        background-color: rgba(51, 204, 255, 0.5); /* Cyan highlight */
+      }
+
+      #entry:selected #text {
+        color: #ffffff;                          /* White text for selected */
+      }
+
+      #entry:drop(active) {
+        background-color: rgba(51, 204, 255, 0.5) !important; /* Cyan highlight */
+      }
+    '';
+  };
+
+  # Configure hyprpaper for desktop wallpaper
+  services.hyprpaper = {
+    enable = true;
+    settings = {
+      preload = [
+        "$HOME/.config/backgrounds/shaded_landscape.png"
+      ];
+      wallpaper = [
+        ",$HOME/.config/backgrounds/shaded_landscape.png"  # Apply to all monitors
+      ];
     };
   };
+
+  # Configure hyprlock
+  programs.hyprlock = {
+    enable = true;
+    settings = {
+      # Define all colors as variables at the top
+      extraConfig = ''
+        $mauve = rgb(203, 166, 247)      # Accent color (Catppuccin Mauve)
+        $mauveAlpha = rgba(203, 166, 247, 0.5)  # Accent with alpha
+        $base = rgb(30, 30, 46)          # Background base color
+        $text = rgb(205, 214, 244)       # Text color
+        $textAlpha = rgba(205, 214, 244, 0.8)  # Text with alpha
+        $surface0 = rgb(49, 50, 68)      # Input field background
+        $red = rgb(243, 139, 168)        # Failure color
+        $yellow = rgb(250, 179, 135)     # Caps lock color
+
+        $accent = $mauve
+        $accentAlpha = $mauveAlpha
+        $font = JetBrainsMono Nerd Font
+      '';
+
+      general = {
+        disable_loading_bar = true;
+        hide_cursor = true;
+      };
+
+      background = [
+        {
+          # monitor = "";
+          path = "$HOME/.config/backgrounds/shaded_landscape.png";  # Same as desktop wallpaper
+          blur_passes = 2;
+          # color = "$base";  # Fallback color if image fails
+        }
+      ];
+
+      label = [
+        # Time
+        {
+          monitor = "";
+          text = ''cmd[update:30000] echo "$(date +"%R")"'';
+          color = "$text";
+          font_size = 70;
+          font_family = "$font";
+          position = "-30, 0";
+          halign = "right";
+          valign = "top";
+        }
+        # Date
+        {
+          monitor = "";
+          text = ''cmd[update:43200000] echo "$(date +"%A, %d %B %Y")"'';
+          color = "$text";
+          font_size = 20;
+          font_family = "$font";
+          position = "-30, -150";
+          halign = "right";
+          valign = "top";
+        }
+      ];
+
+      image = [
+        {
+          monitor = "";
+          path = "~/.config/backgrounds/shaded_landscape.png";
+          size = 100;
+          border_color = "$accent";
+          position = "0, 75";
+          halign = "center";
+          valign = "center";
+        }
+      ];
+
+      input-field = [
+        {
+          monitor = "";
+          size = "250, 45";
+          outline_thickness = 4;
+          dots_size = 0.2;
+          dots_spacing = 0.2;
+          dots_center = true;
+          outer_color = "$accent";
+          inner_color = "$surface0";
+          font_color = "$text";
+          fade_on_empty = false;
+          placeholder_text = ''󰌾 Logged in as $USER'';
+          hide_input = false;
+          check_color = "$accent";
+          fail_color = "$red";
+          fail_text = "<i>$FAIL <b>($ATTEMPTS)</b></i>";
+          capslock_color = "$yellow";
+          position = "0, -35";
+          halign = "center";
+          valign = "center";
+        }
+      ];
+    };
+  };
+
+# programs.hyprlock = {
+  #   enable = true;
+  #   settings = {
+  #     general = {
+  #       disable_loading_bar = true;
+  #       grace = 0;  # Seconds to wait before locking (grace period)
+  #       no_fade_in = false;  # Ensure the lock screen appears instantly
+  #       no_fade_out = true; # Ensure the input field doesn't fade out
+  #     };
+  #     background = [
+  #       {
+  #         monitor = "";  # Apply to all monitors
+  #         path = "";     # No image, use solid color
+  #         color = "rgb(48, 48, 48)";
+  #       }
+  #     ];
+  #     input-field = [
+  #       {
+  #         monitor = "";
+  #         size = "200, 30";
+  #         position = "0, 0";
+  #         halign = "center";
+  #         valign = "center";
+  #         placeholder_text = "<i>Enter Password...</i>";
+  #         hide_input = false;  # Always show password input (dots, not hidden)
+  #         fade_on_empty = false;  # Keep input visible even when empty
+  #         fail_text = "<i>Wrong Password!</i>";  # Show error but don’t hide input
+
+  #         outer_color = "rgb(51, 51, 51)";  # Darker blackish border (#333333)
+  #         inner_color = "rgb(169, 169, 169)";  # Lighter grey background (#A9A9A9)
+  #         font_color = "rgb(51, 51, 51)";  
+  #         outline_thickness = 1;  # Very thin border (1px)
+  #       }
+  #     ];
+  #   };
+  # };
+
+  # Configure hypridle to lock screen after timeout
+  services.hypridle = {
+    enable = true;
+    settings = {
+      general = {
+        lock_cmd = "pidof hyprlock || hyprlock";  # Only run hyprlock if not already running
+        before_sleep_cmd = "loginctl lock-session";  # Lock before sleep
+      };
+      listener = [
+        {
+          timeout = 300;  # 5 minutes (in seconds)
+          on-timeout = "hyprlock";  # Lock screen after 5 minutes of inactivity
+        }
+        {
+          timeout = 600;  # 10 minutes (in seconds)
+          on-timeout = "hyprctl dispatch dpms off";  # Turn off screen after 6 minutes
+          on-resume = "systemctl suspend-then-hibernate";   # Turn screen back on when activity resumes
+        }
+      ];
+    };
+  };
+
 }
 
 

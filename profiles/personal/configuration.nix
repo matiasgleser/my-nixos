@@ -25,6 +25,8 @@
 
   # Timezone and locale
   time.timeZone = systemSettings.timezone;
+  services.timesyncd.enable = true; 
+
   i18n.defaultLocale = systemSettings.systemLang;
   # i18n.defaultLocale = systemSettings.locale;
   i18n.extraLocaleSettings = {
@@ -144,7 +146,7 @@
     lunarvim
     rustup
     cargo
-    nerd-fonts.fira-code
+    # nerd-fonts.fira-code
     zoxide
     bat
     openssl
@@ -169,7 +171,7 @@
     wl-clipboard      # Clipboard management
     grim             # Screenshot tool
     slurp            # Region selection for screenshots
-    mako             # Alternative notification daemon (optional)
+    # mako             # Alternative notification daemon (optional)
   ];
 
   # Nix settings
