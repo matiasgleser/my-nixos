@@ -18,7 +18,7 @@ in
     brightnessctl                     # For brightness control
     playerctl                         # For media control
     hyprpaper                         # For wallpaper control
-    hypridle                          # For idleness control
+    swayidle                          # For idleness control
     hyprlock                          # For lock screen
     hyprshot                          # For screenshots with mouse
     swaynotificationcenter            # For custom notifications
@@ -1080,24 +1080,38 @@ in
   # };
 
   # Configure hypridle to lock screen after timeout
-  services.hypridle = {
+  services.swayidle = {
     enable = true;
-    settings = {
-      general = {
-        lock_cmd = "pidof hyprlock || hyprlock";  # Only run hyprlock if not already running
-        before_sleep_cmd = "loginctl lock-session";  # Lock before sleep
-      };
-      listener = [
-        {
-          timeout = 300;  # 5 minutes (in seconds)
-          on-timeout = "hyprlock";  # Lock screen after 5 minutes of inactivity
-        }
-        {
-          timeout = 600;  # 10 minutes (in seconds)
-          on-resume = "suspend-if-no-media";
-        }
-      ];
-    };
+    timeouts = [
+      { timeout = 300; command = "pidof hyprlock || hyprlock"; }  # Lock after 300s of idle time
+      { timeout = 600; command = "systemctl suspend"; }  # Suspend after 600s of idle time
+    ];
+    events = [
+      { event = "before-sleep"; command = "loginctl lock-session"; }
+      { event = "after-resume"; command = "hyprctl dispatch dpms on"; }
+    ];
+    extraArgs = [
+      "inhibit-while inhibit-media"  # Continuously monitor media playback
+      "resume inhibit-media"  # Reset timer when media playback state changes
+    ];
+
+
+    # settings = {
+    #   general = {
+    #     lock_cmd = "pidof hyprlock || hyprlock";  # Only run hyprlock if not already running
+    #     before_sleep_cmd = "loginctl lock-session";  # Lock before sleep
+    #   };
+    #   listener = [
+    #     {
+    #       timeout = 300;  # 5 minutes (in seconds)
+    #       on-timeout = "hyprlock";  # Lock screen after 5 minutes of inactivity
+    #     }
+    #     {
+    #       timeout = 600;  # 10 minutes (in seconds)
+    #       on-resume = "suspend-if-no-media";
+    #     }
+    #   ];
+    # };
   };
 
 }

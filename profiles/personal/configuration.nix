@@ -8,7 +8,7 @@
   imports = [
     # Include the results of the hardware scan.
     ../../system/hardware-configuration.nix
-    ../../system/bin/suspend.nix
+    ../../system/bin/inhibit-if-media.nix
    (../../system/wm + "/${userSettings.wm}.nix")         # My window manager selected from flake
   ];
 
