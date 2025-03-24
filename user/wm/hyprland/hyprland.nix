@@ -38,10 +38,8 @@ in
       exec-once = [
         # "MOZ_ENABLE_WAYLAND=1 firefox"
         "chromium --ozone-platform-hint=auto"
-        "waybar"
         "swaync"
-        "hypridle"
-        "hyprpaper"
+        "waybar & hyprpaper & hypridle"
       ];
 
       "$terminal" = userSettings.term;
@@ -1096,8 +1094,7 @@ in
         }
         {
           timeout = 600;  # 10 minutes (in seconds)
-          on-timeout = "hyprctl dispatch dpms off";  # Turn off screen after 6 minutes
-          on-resume = "systemctl suspend-then-hibernate";   # Turn screen back on when activity resumes
+          on-resume = "suspend-if-no-media";
         }
       ];
     };

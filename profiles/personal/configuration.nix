@@ -8,7 +8,8 @@
   imports = [
     # Include the results of the hardware scan.
     ../../system/hardware-configuration.nix
-    (../../system/wm + "/${userSettings.wm}.nix")         # My window manager selected from flake
+    ../../system/bin/suspend.nix
+   (../../system/wm + "/${userSettings.wm}.nix")         # My window manager selected from flake
   ];
 
  # Ensure nix flakes are enabled
