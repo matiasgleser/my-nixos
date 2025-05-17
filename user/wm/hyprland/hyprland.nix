@@ -18,7 +18,7 @@ in
     brightnessctl                     # For brightness control
     playerctl                         # For media control
     hyprpaper                         # For wallpaper control
-    swayidle                          # For idleness control
+    hypridle                          # For idleness control
     hyprlock                          # For lock screen
     hyprshot                          # For screenshots with mouse
     swaynotificationcenter            # For custom notifications
@@ -1042,77 +1042,27 @@ in
     };
   };
 
-# programs.hyprlock = {
-  #   enable = true;
-  #   settings = {
-  #     general = {
-  #       disable_loading_bar = true;
-  #       grace = 0;  # Seconds to wait before locking (grace period)
-  #       no_fade_in = false;  # Ensure the lock screen appears instantly
-  #       no_fade_out = true; # Ensure the input field doesn't fade out
-  #     };
-  #     background = [
-  #       {
-  #         monitor = "";  # Apply to all monitors
-  #         path = "";     # No image, use solid color
-  #         color = "rgb(48, 48, 48)";
-  #       }
-  #     ];
-  #     input-field = [
-  #       {
-  #         monitor = "";
-  #         size = "200, 30";
-  #         position = "0, 0";
-  #         halign = "center";
-  #         valign = "center";
-  #         placeholder_text = "<i>Enter Password...</i>";
-  #         hide_input = false;  # Always show password input (dots, not hidden)
-  #         fade_on_empty = false;  # Keep input visible even when empty
-  #         fail_text = "<i>Wrong Password!</i>";  # Show error but don’t hide input
-
-  #         outer_color = "rgb(51, 51, 51)";  # Darker blackish border (#333333)
-  #         inner_color = "rgb(169, 169, 169)";  # Lighter grey background (#A9A9A9)
-  #         font_color = "rgb(51, 51, 51)";  
-  #         outline_thickness = 1;  # Very thin border (1px)
-  #       }
-  #     ];
-  #   };
-  # };
-
   # Configure hypridle to lock screen after timeout
-  services.swayidle = {
-    enable = true;
-    timeouts = [
-      { timeout = 300; command = "pidof hyprlock || hyprlock"; }  # Lock after 300s of idle time
-      { timeout = 600; command = "systemctl suspend"; }  # Suspend after 600s of idle time
-    ];
-    events = [
-      { event = "before-sleep"; command = "loginctl lock-session"; }
-      { event = "after-resume"; command = "hyprctl dispatch dpms on"; }
-    ];
-    extraArgs = [
-      "inhibit-while inhibit-media"  # Continuously monitor media playback
-      "resume inhibit-media"  # Reset timer when media playback state changes
-    ];
-
-
-    # settings = {
-    #   general = {
-    #     lock_cmd = "pidof hyprlock || hyprlock";  # Only run hyprlock if not already running
-    #     before_sleep_cmd = "loginctl lock-session";  # Lock before sleep
-    #   };
-    #   listener = [
-    #     {
-    #       timeout = 300;  # 5 minutes (in seconds)
-    #       on-timeout = "hyprlock";  # Lock screen after 5 minutes of inactivity
-    #     }
-    #     {
-    #       timeout = 600;  # 10 minutes (in seconds)
-    #       on-resume = "suspend-if-no-media";
-    #     }
-    #   ];
-    # };
-  };
+  services.hypridle = {
+     enable = true;
+     settings = {
+       general = {
+         lock_cmd = "pidof hyprlock || hyprlock";  # Only run hyprlock if not already running
+         before_sleep_cmd = "loginctl lock-session";  # Lock before sleep
+       };
+       listener = [
+         {
+           timeout = 1800;  # 30 minutes (in seconds)
+           on-timeout = "hyprlock";  # Lock screen after 5 minutes of inactivity
+         }
+         {
+           timeout = 3600;  # 60 minutes (in seconds)
+           on-timeout = "systemctl suspend";  # Turn off screen after 6 minutes
+           on-resume = "hyprctl dispatch dpms on";   # Turn screen back on when activity resumes
+         }
+       ];
+     };
+   };
 
 }
 

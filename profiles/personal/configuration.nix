@@ -54,33 +54,6 @@
     uid = 1000;
   };
 
-
-  # Fonts
-#   fonts = {
-#     packages = with pkgs; [
-#       terminus_font
-#       font-awesome
-#       noto-fonts
-#       noto-fonts-emoji
-# #       nerd-fonts.meslo
-#       #(nerdfonts.override {fonts = ["Meslo"];})
-#     ];
-#     fontconfig = {
-#       enable = true;
-#       includeUserConf = true;
-#     };
-#     fontDir = {
-#       enable = true;
-#     };
-#   };
-
-
-  # Enable Hyprland
-  # programs.hyprland = {
-  #   enable = true;
-  #   xwayland.enable = true;
-  # };
-
   # Basic X server for compatibility (optional, remove if pure Wayland is desired)
   services.xserver.enable = true;
   services.xserver.xkb.layout = "${systemSettings.primaryKbLang},${systemSettings.secondaryKbLang}";
@@ -102,23 +75,6 @@
 
   # Printing
   services.printing.enable = true;
-
-  # # User account
-  # users.users.mati = {
-  #   isNormalUser = true;
-  #   description = "mati";
-  #   extraGroups = [ "networkmanager" "wheel" ];
-  #   packages = with pkgs; [
-  #     # Hyprland-specific utilities
-  #     waybar            # Status bar
-  #     dunst             # Notification daemon
-  #     rofi-wayland      # Application launcher
-  #     hyprpaper         # Wallpaper utility
-  #     swaylock          # Screen locker
-  #   ];
-  # };
-
-
 
   # Programs
   programs.firefox.enable = true;
@@ -145,8 +101,8 @@
     # libstdcxx5
     wget
     lunarvim
-    rustup
-    cargo
+    # rustup
+    # cargo
     # nerd-fonts.fira-code
     zoxide
     bat
@@ -156,9 +112,9 @@
     xclip
     gparted
     pandoc
-    julia
+    # julia
     zoom-us
-    R
+    # R
     # rstudio
     brave
     hugo
@@ -176,6 +132,6 @@
   ];
 
   # Nix settings
-  system.stateVersion = "24.05";
+  system.stateVersion = "24.11";
   
 }

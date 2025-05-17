@@ -12,7 +12,7 @@
         timezone = "America/Argentina/Buenos_Aires";       # Timezone to be used in clock
         locale = "es_AR.UTF-8";                            # The locale used in time settings for example
         systemLang = "en_US.UTF-8";                        # The language used in the system
-        primaryKbLang = "es";                              # The primary language used in keyboard
+        primaryKbLang = "latam";                              # The primary language used in keyboard
         secondaryKbLang = "us";                            # The secondary language used in keyboard
       };
 
@@ -133,12 +133,12 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "nixpkgs/nixos-24.05";
+    nixpkgs-stable.url = "nixpkgs/nixos-24.11";
 
     home-manager-unstable.url = "github:nix-community/home-manager/master";
     home-manager-unstable.inputs.nixpkgs.follows = "nixpkgs";
 
-    home-manager-stable.url = "github:nix-community/home-manager/release-24.05";
+    home-manager-stable.url = "github:nix-community/home-manager/release-24.11";
     home-manager-stable.inputs.nixpkgs.follows = "nixpkgs-stable";
     
     # hyprland = {

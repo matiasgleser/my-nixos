@@ -19,13 +19,16 @@
     (./. + "../../../user/wm"+("/"+userSettings.wm+"/"+userSettings.wm)+".nix") # My window manager selected from flake
     (./. + "../../../user/apps/file-manager"+("/"+userSettings.fileManager)+".nix") # My file manager selected from flake
     ../../user/apps/git/git.nix # My git config
+    
+    # Langs
+    ../../user/lang/julia/julia.nix 
 
   ];
 
   # Packages to use
   home.packages = [
     userSettings.fontPkg          # Install the font package specified in userSettings    
-
+    pkgs.zed-editor
   ];
 
 }
